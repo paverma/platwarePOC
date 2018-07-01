@@ -9,7 +9,7 @@ var PWRequest = {
         "platform": "WEB",
         "orgid": "",
         "authorization": "",
-        "requesttype": "PR_PR",
+        "requesttype": "",
         "txnkey": "",
         "requestid": "",
         "appid": "",

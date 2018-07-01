@@ -10,7 +10,6 @@ AesUtil.prototype.generateKey = function (salt, passPhrase) {
             passPhrase,
             CryptoJS.enc.Hex.parse(salt),
             {keySize: this.keySize, iterations: this.iterationCount});
-            console.log("typeof",typeof(key))
     return key;
 }
 

@@ -1,6 +1,6 @@
 
-var dataFormat = function () {
-    var today = new Date();
+var dataFormat = function (type,today) {
+    
     var day = today.getDate() + "";
     var month = (today.getMonth() + 1) + "";
     var year = today.getFullYear() + "";
@@ -15,7 +15,11 @@ var dataFormat = function () {
     mintues = checkZero(minutes);
     seconds = checkZero(seconds);
 
-    return day + "-" + month + "-" + year + " " + hour + ":" + minutes + ":" + seconds
+    if(type === 'device'){
+        return day + "-" + month + "-" + year + " " + hour + ":" + minutes + ":" + seconds
+    }else if(type === 'requestid'){
+        return day + month +  year + hour +minutes + seconds
+    }
 
     function checkZero(data) {
         if (data.length == 1) {

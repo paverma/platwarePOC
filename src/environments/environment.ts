@@ -12,6 +12,6 @@ export const environment = {
     securityKey: "51ba2618-e7ba-41b2-8eea-99009d5d51ab",
     platform: 'WEB'
   },
-  // url:'http://203.112.149.200:443/router/engine/v1'
-  url:"http://192.168.1.67:9002/router/engine/v1"
+  // baseUrl:'http://203.112.149.200:443/router/engine/v1'
+  baseUrl:"http://192.168.1.67:9002/router/engine/v1"
 };
