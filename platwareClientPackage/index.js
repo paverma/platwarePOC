@@ -23,29 +23,60 @@ exports.prepareRequest = function (data) {
 exports.callPlatware = function (data, callback) {
   
   var requestData = PWCRequest.preparePwHeader(data, fingerprint())
+  
   // url: 'http://203.112.149.200:443/config/authenticateUser',
   var options = {
+    method: 'POST',
     url: data.envProps.environment.baseUrl + data.url,
     headers: requestData.PWRequest.PWHeader,
-    body: requestData.PWRequest.PWBody
+        body: requestData.PWRequest.PWBody
   };
-
-  console.log("options", options);
-
-  function httpAuthentication(error, response, body) {
-    console.log("response", response);
-
-    callback(response);
-
-    if (!error && response.statusCode == 200) {
-      var info = JSON.parse(body);
-    } else {
-      console.log("get error")
+  
+function request(url) {
+  const xhr = new XMLHttpRequest();
+  xhr.timeout = 60000;
+  xhr.onreadystatechange = function (e) {
+    console.log("xhr",xhr)
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        callback(xhr.status);
+        console.log("Code here for the server answer when successful")
+       // Code here for the server answer when successful
+      } 
     }
   }
-  request.post(options, httpAuthentication);
+  xhr.onerror = function (error) {
+    console.log("Code here for the server answer when not successful")
+    callback(error);
+  }
+  xhr.ontimeout = function () {
+    callback(xhr);
+    console.log("ontimeout")
+    // Well, it took to long do some code here to handle that
+  }
+  console.log("requestData.PWRequest.PWHeader",JSON.stringify(requestData.PWRequest.PWHeader))
+  xhr.open('POST', 'http://192.168.1.67:9002/router/engine/v1/register', true)
+console.log("requestData.PWRequest.PWBody",requestData.PWRequest.PWHeader)
+for(var key in requestData.PWRequest.PWHeader) {
+  xhr.setRequestHeader(key, requestData.PWRequest.PWHeader[key]);  
+}
+  xhr.send(JSON.stringify(requestData.PWRequest.PWBody));
 }
 
+request();
+  // function httpAuthentication(error, response, body) {
+    
+  //   if (!error && response.statusCode == 200) {
+  //     callback(response);
+  //     var info = JSON.parse(body);
+  //   } else {
+  //     callback(response);
+  //     console.log("get error")
+  //   }
+  // }
+  // request(options, httpAuthentication);
+
+}
 exports.getEncryption = function (plaintext, randomKey) {
   // var randomKey = '18062911052582006609007567706159';
   var a = AESEncryption.cryptor.encryptText(plaintext, randomKey);
