@@ -74,7 +74,7 @@ var cryptor = {
     },
     encryptText: function (plainMsg, keyStr, callback) {
 
-        var iv = "d1553cdbef4d0b8c";
+        var iv = "00000000000000000000000000000000";
         var salt = "00000000000000000000000000000000";
         var keySize = 128;
         var iterationCount = 100;
@@ -91,7 +91,7 @@ var cryptor = {
          // alert(response);
          callback(response);
          });  */
-        var iv = "d1553cdbef4d0b8c";
+        var iv = "00000000000000000000000000000000";
         var salt = "00000000000000000000000000000000";
         var keySize = 128;
         var iterationCount = 100;

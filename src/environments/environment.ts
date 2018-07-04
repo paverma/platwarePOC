@@ -6,12 +6,12 @@
 export const environment = {
   production: false,
   envProps : {
-    orgId: 'KOTAK',
-    appId: 'KOTAKDO',
-    clientId : 'KOTAK~KOTAKDO',
+    orgId: 'COP',
+    appId: 'EA',
     securityKey: "51ba2618-e7ba-41b2-8eea-99009d5d51ab",
     platform: 'WEB'
   },
   // baseUrl:'http://203.112.149.200:443/router/engine/v1'
-  baseUrl:"http://192.168.1.67:9002/router/engine/v1"
+  baseUrl:'http://203.112.149.199:9009/routerweb/engine/v1'
+  // baseUrl:"http://192.168.1.67:9002/router/engine/v1"
 };

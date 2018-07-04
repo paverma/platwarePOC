@@ -27,7 +27,7 @@ preparePwHeader = function (data, deviceid) {
 
     props.PWRequest.PWHeader.orgid = data.envProps.environment.envProps.orgId;
     props.PWRequest.PWHeader.appid = data.envProps.environment.envProps.appId;
-    props.PWRequest.PWHeader.clientid = data.envProps.environment.envProps.clientId;
+    props.PWRequest.PWHeader.clientid = data.envProps.environment.envProps.orgId + "~"+data.envProps.environment.envProps.appId;
 
     props.PWRequest.PWHeader.servicename = _services;
     props.PWRequest.PWHeader.loginid = '';
@@ -49,8 +49,13 @@ preparePwHeader = function (data, deviceid) {
         props.PWRequest.PWBody.interfaces[x] = _interfacesKeys[x]
     }
 
+    console.log("_authEncryptKey",_authEncryptKey)
   var _hashKey = getHashvalue("Basic " + _authEncryptKey, data.envProps.environment.envProps.securityKey);
 
+
+  // console.log("dateConversion.dataFormat('requestid', _currentDate)",dateConversion.dataFormat('tnxDate', _currentDate));
+  // var __tnx = randomString(32- dateConversion.dataFormat('tnxDate', _currentDate).length);
+  // console.log("txnKey = ",dateConversion.dataFormat('tnxDate', _currentDate) +__tnx) 
     props.PWRequest.PWHeader.txnkey = '',
     props.PWRequest.PWHeader.requestid = data.envProps.environment.envProps.orgId +
     data.envProps.environment.envProps.appId + deviceid + _loginId + dateConversion.dataFormat('requestid', _currentDate);
@@ -85,6 +90,16 @@ var getHashvalue = function (plaintext, key) {
     return hash;
 }
 
+
+
+var randomString = function(length) {
+    const chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let result = '';
+    for (let i = length; i > 0; --i) {
+      result += chars[Math.round(Math.random() * (chars.length - 1))];
+    }
+    return result;
+  }
 
 module.exports = {
     preparePwHeader
