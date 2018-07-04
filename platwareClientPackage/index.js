@@ -5,78 +5,33 @@ var PWCRequest = require('./pwcRequest.js');
 
 var Fingerprint = require('../node_modules/fingerprintjs');
 
-var request = require('../node_modules/request');
-
 var fingerprint = function () {
   return new Fingerprint().get().toString();
 }
 
-exports.printMsg1 = function () {
-  console.log("This is a message from the demo1 package");
-}
-
 exports.prepareRequest = function (data) {
   console.log("prepareRequest =", PWCRequest.preparePwHeader(data, fingerprint()));
-
 }
-
 
 exports.callPlatware = function (data, callback) {
   var requestData = PWCRequest.preparePwHeader(data, fingerprint())
 
-  // url: 'http://203.112.149.200:443/config/authenticateUser',
-  // var options = {
-  //   method: 'POST',
-  //   url: data.envProps.environment.baseUrl + data.url,
-  //   headers: requestData.PWRequest.PWHeader,
-  //   body: requestData.PWRequest.PWBody
-  // };
-
-  console.log("data.url", data.url)
   switch (data.url) {
     case '/register':
       const xhr = new XMLHttpRequest();
-
-      function request(url) {
+      function request1() {
         xhr.timeout = 100000;
         xhr.onreadystatechange = function (e) {
-          console.log("xhr", xhr)
-          // console.log("securityKey=",data.envProps.environment.envProps.securityKey)
+          console.log("xhr", xhr.getAllResponseHeaders())
+
           if (xhr.readyState === 4) {
             if (xhr.status === 200) {
-              var headers = xhr.getAllResponseHeaders();
-              var arr = headers.trim().split(/[\r\n]+/);
 
-              // Create a map of header names to values
-              var headerMap = {};
-              arr.forEach(function (line) {
-                var parts = line.split(': ');
-                var header = parts.shift();
-                var value = parts.join(': ');
-                headerMap[header] = value;
-              });
-              var contentType = headerMap["hash"];
               var bodyData = JSON.parse(xhr.response);
               var new1 = bodyData.services.REGISTERAPP.records[0].data[0].rsa;
               var new2 = JSON.parse(new1);
-              for(key in new2)
-{
-  localStorageAESPublicKey({
-    key: new2[key],
-  }, data.envProps.environment.envProps.securityKey);
-console.log("valvalval", key)
-}
-              console.log("new1",new1, )
-              // console.log("xhr====", bodyData.services,
-              //   headers, headerMap, contentType)
-
-              // localStorageAESPublicKey({
-              //   "public-exponent": "",
-              //   "private-modules": "value",
-              //   "public-modules": "value",
-              //   "private-exponent": "value"
-              // }, data.envProps.environment.envProps.securityKey);
-
+              localStorageAESPublicKey(new2, data.envProps.environment.envProps.securityKey);
+              // console.log("new1", new1, )
 
               callback(xhr.response);
               console.log("Code here for the server answer when successful")
@@ -93,7 +48,6 @@ console.log("valvalval", key)
           console.log("ontimeout")
           // Well, it took to long do some code here to handle that
         }
-        // console.log("requestData.PWRequest.PWHeader", JSON.stringify(requestData.PWRequest.PWHeader))
         xhr.open('POST', data.envProps.environment.baseUrl + data.url, true)
         for (var key in requestData.PWRequest.PWHeader) {
           xhr.setRequestHeader(key, requestData.PWRequest.PWHeader[key]);
@@ -102,19 +56,11 @@ console.log("valvalval", key)
         xhr.send(JSON.stringify(requestData.PWRequest.PWBody));
       }
       console.log("requestData ====", requestData)
-      request();
+      request1();
 
       break;
 
     case '/auth':
-
-      break;
-
-    case '/logout':
-
-      break;
-
-  }
 
   // function request(url) {
   //   const xhr = new XMLHttpRequest();
@@ -148,21 +94,13 @@ console.log("valvalval", key)
   // }
 
   // request();
+      break;
 
+    case '/logout':
 
+      break;
 
-
-  // function httpAuthentication(error, response, body) {
-
-  //   if (!error && response.statusCode == 200) {
-  //     callback(response);
-  //     var info = JSON.parse(body);
-  //   } else {
-  //     callback(response);
-  //     console.log("get error")
-  //   }
-  // }
-  // request(options, httpAuthentication);
+  }
 
 }
 
@@ -172,8 +110,7 @@ var localStorageAESPublicKey = function (data, key) {
   for (var keyValue in data) {
     obj[keyValue] = AESEncryption.cryptor.encryptText(data[keyValue], key);
   }
-  localStorage.setItem("key", JSON.stringify(obj))
-  console.log("data, key",data, key,JSON.stringify(obj))
+  localStorage.setItem("Publickey", JSON.stringify(obj))
 }
 
 exports.getEncryption = function (plaintext, randomKey) {
@@ -190,14 +127,6 @@ exports.getHashvalue = function (plaintext, key) {
   var hash = CryptoJS.HmacSHA512(plaintext, key).toString();
   return hash;
 }
-
-function hmac_512(message, secret) {
-  var hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA512, secret);
-  hmac.update(message);
-  var hash = hmac.finalize();
-  return hash;
-}
-
 
 exports.getRSA = function (plaintext, publicKey) {
   var PassPhrase = "The Moon is a Harsh Mistress.";
