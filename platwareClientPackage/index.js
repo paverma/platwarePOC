@@ -13,87 +13,92 @@ exports.prepareRequest = function (data) {
   console.log("prepareRequest =", PWCRequest.preparePwHeader(data, fingerprint()));
 }
 
+var registerAPi = function (requestData, data, callback) {
+  const xhr = new XMLHttpRequest();
+
+  function requestAPi() {
+    xhr.timeout = 100000;
+    xhr.onreadystatechange = function (e) {
+      console.log("xhr", xhr.getAllResponseHeaders())
+
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+
+          var bodyData = JSON.parse(xhr.response);
+          var new1 = bodyData.services.REGISTERAPP.records[0].data[0].rsa;
+          var new2 = JSON.parse(new1);
+          localStorageAESPublicKey(new2, data.envProps.environment.envProps.securityKey);
+          // console.log("new1", new1, )
+
+          callback(xhr.response);
+          console.log("Code here for the server answer when successful")
+          // Code here for the server answer when successful
+        }
+      }
+    }
+    xhr.onerror = function (error) {
+      console.log("Code here for the server answer when not successful")
+      callback(error);
+    }
+    xhr.ontimeout = function () {
+      callback(xhr);
+      console.log("ontimeout")
+      // Well, it took to long do some code here to handle that
+    }
+    xhr.open('POST', data.envProps.environment.baseUrl + data.url, true)
+    for (var key in requestData.PWRequest.PWHeader) {
+      xhr.setRequestHeader(key, requestData.PWRequest.PWHeader[key]);
+    }
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify(requestData.PWRequest.PWBody));
+  }
+  console.log("requestData ====", requestData)
+  requestAPi();
+
+}
+
 exports.callPlatware = function (data, callback) {
   var requestData = PWCRequest.preparePwHeader(data, fingerprint())
 
   switch (data.url) {
     case '/register':
-      const xhr = new XMLHttpRequest();
-      function request1() {
-        xhr.timeout = 100000;
-        xhr.onreadystatechange = function (e) {
-          console.log("xhr", xhr.getAllResponseHeaders())
-
-          if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-
-              var bodyData = JSON.parse(xhr.response);
-              var new1 = bodyData.services.REGISTERAPP.records[0].data[0].rsa;
-              var new2 = JSON.parse(new1);
-              localStorageAESPublicKey(new2, data.envProps.environment.envProps.securityKey);
-              // console.log("new1", new1, )
-
-              callback(xhr.response);
-              console.log("Code here for the server answer when successful")
-              // Code here for the server answer when successful
-            }
-          }
-        }
-        xhr.onerror = function (error) {
-          console.log("Code here for the server answer when not successful")
-          callback(error);
-        }
-        xhr.ontimeout = function () {
-          callback(xhr);
-          console.log("ontimeout")
-          // Well, it took to long do some code here to handle that
-        }
-        xhr.open('POST', data.envProps.environment.baseUrl + data.url, true)
-        for (var key in requestData.PWRequest.PWHeader) {
-          xhr.setRequestHeader(key, requestData.PWRequest.PWHeader[key]);
-        }
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.send(JSON.stringify(requestData.PWRequest.PWBody));
-      }
-      console.log("requestData ====", requestData)
-      request1();
-
+      registerAPi(requestData, data, callback);
       break;
 
     case '/auth':
 
-  // function request(url) {
-  //   const xhr = new XMLHttpRequest();
-  //   xhr.timeout = 60000;
-  //   xhr.onreadystatechange = function (e) {
-  //     console.log("xhr", xhr)
-  //     if (xhr.readyState === 4) {
-  //       if (xhr.status === 200) {
-  //         callback(xhr.status);
-  //         console.log("Code here for the server answer when successful")
-  //         // Code here for the server answer when successful
-  //       }
-  //     }
-  //   }
-  //   xhr.onerror = function (error) {
-  //     console.log("Code here for the server answer when not successful")
-  //     callback(error);
-  //   }
-  //   xhr.ontimeout = function () {
-  //     callback(xhr);
-  //     console.log("ontimeout")
-  //     // Well, it took to long do some code here to handle that
-  //   }
-  //   console.log("requestData.PWRequest.PWHeader", JSON.stringify(requestData.PWRequest.PWHeader))
-  //   xhr.open('POST', 'http://192.168.1.67:9002/router/engine/v1/register', true)
-  //   console.log("requestData.PWRequest.PWBody", requestData.PWRequest.PWHeader)
-  //   for (var key in requestData.PWRequest.PWHeader) {
-  //     xhr.setRequestHeader(key, requestData.PWRequest.PWHeader[key]);
-  //   }
-  //   xhr.send(JSON.stringify(requestData.PWRequest.PWBody));
-  // }
+      // function request(url) {
+      //   const xhr = new XMLHttpRequest();
+      //   xhr.timeout = 60000;
+      //   xhr.onreadystatechange = function (e) {
+      //     console.log("xhr", xhr)
+      //     if (xhr.readyState === 4) {
+      //       if (xhr.status === 200) {
+      //         callback(xhr.status);
+      //         console.log("Code here for the server answer when successful")
+      //         // Code here for the server answer when successful
+      //       }
+      //     }
+      //   }
+      //   xhr.onerror = function (error) {
+      //     console.log("Code here for the server answer when not successful")
+      //     callback(error);
+      //   }
+      //   xhr.ontimeout = function () {
+      //     callback(xhr);
+      //     console.log("ontimeout")
+      //     // Well, it took to long do some code here to handle that
+      //   }
+      //   console.log("requestData.PWRequest.PWHeader", JSON.stringify(requestData.PWRequest.PWHeader))
+      //   xhr.open('POST', 'http://192.168.1.67:9002/router/engine/v1/register', true)
+      //   console.log("requestData.PWRequest.PWBody", requestData.PWRequest.PWHeader)
+      //   for (var key in requestData.PWRequest.PWHeader) {
+      //     xhr.setRequestHeader(key, requestData.PWRequest.PWHeader[key]);
+      //   }
+      //   xhr.send(JSON.stringify(requestData.PWRequest.PWBody));
+      // }
 
-  // request();
+      // request();
       break;
 
     case '/logout':
@@ -111,6 +116,7 @@ var localStorageAESPublicKey = function (data, key) {
     obj[keyValue] = AESEncryption.cryptor.encryptText(data[keyValue], key);
   }
   localStorage.setItem("Publickey", JSON.stringify(obj))
+  console.log("localStorage")
 }
 
 exports.getEncryption = function (plaintext, randomKey) {
@@ -129,6 +135,9 @@ exports.getHashvalue = function (plaintext, key) {
 }
 
 exports.getRSA = function (plaintext, publicKey) {
+
+
+  
   var PassPhrase = "The Moon is a Harsh Mistress.";
   var Bits = 512;
 
